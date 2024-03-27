@@ -57,27 +57,31 @@
     mov r0.w,   ones
     
     ; Zero a 3x4 matrix for the bone transform
-    MOV r10, zeros
-    MOV r11, zeros
-    MOV r12, zeros
+    ;MOV r10, zeros
+    ;MOV r11, zeros
+    ;MOV r12, zeros
     
     ; Bone 0
     MOVA a0.x, inbone_idx.x
-    MUL r9, bone00[a0.x+0].xyzw, inbone_wgt.xxxx
-    ADD r10, r10, r9
-    MUL r9, bone00[a0.x+1].xyzw, inbone_wgt.xxxx
-    ADD r11, r11, r9
-    MUL r9, bone00[a0.x+2].xyzw, inbone_wgt.xxxx
-    ADD r12, r12, r9
+    MOV r10, bone00[a0.x+0].xyzw
+    MOV r11, bone00[a0.x+1].xyzw
+    MOV r12, bone00[a0.x+2].xyzw
+    
+    ;MUL r9, bone00[a0.x+0].xyzw, inbone_wgt.xxxx
+    ;ADD r10, r10, r9
+    ;MUL r9, bone00[a0.x+1].xyzw, inbone_wgt.xxxx
+    ;ADD r11, r11, r9
+    ;MUL r9, bone00[a0.x+2].xyzw, inbone_wgt.xxxx
+    ;ADD r12, r12, r9
     
     ; Bone 1
-    MOVA a0.x, inbone_idx.y
-    MUL r9, bone00[a0.x+0].xyzw, inbone_wgt.yyyy
-    ADD r10, r10, r9
-    MUL r9, bone00[a0.x+1].xyzw, inbone_wgt.yyyy
-    ADD r11, r11, r9
-    MUL r9, bone00[a0.x+2].xyzw, inbone_wgt.yyyy
-    ADD r12, r12, r9
+    ;MOVA a0.x, inbone_idx.y
+    ;MUL r9, bone00[a0.x+0].xyzw, inbone_wgt.yyyy
+    ;ADD r10, r10, r9
+    ;MUL r9, bone00[a0.x+1].xyzw, inbone_wgt.yyyy
+    ;ADD r11, r11, r9
+    ;MUL r9, bone00[a0.x+2].xyzw, inbone_wgt.yyyy
+    ;ADD r12, r12, r9
     
     ; Bone 2 (disabled)
     ;MOVA a0.x, inbone_idx.z

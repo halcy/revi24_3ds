@@ -5,9 +5,9 @@ include ../config.mk
 BASEDIR := ../
 
 # Binary name, author name, desc
-TARGET := evoke23
-AUTHOR := SVatG, K2 and Titan
-DESC := raccoons ate my ticket
+TARGET := revision24
+AUTHOR := KALTGETRAENKEKABEL
+DESC := Effektvorschlag
 
 # Working directories
 BUILD := $(BASEDIR)/build
@@ -37,7 +37,7 @@ TEX := tex3ds
 # Tool flags
 ARCH := -g -march=armv6k -mtune=mpcore -mfloat-abi=hard -mword-relocations
 CFLAGS := -Wno-missing-braces -O3 -std=c99 -fomit-frame-pointer -ffunction-sections -mfloat-abi=hard -ffast-math $(ARCH) -D__3DS__ -DABGR32Pixels \
-		$(foreach dir,$(LIBDIRS),-I$(dir)/include) -I$(BUILD) -DCONF_PLAYER=$(COFIG_PLAYER_MODE) -DCONF_ROCKET_IP='"$(CONFIG_PC_IP)"'
+		$(foreach dir,$(LIBDIRS),-I$(dir)/include) -I$(BUILD) -DCONF_PLAYER=$(CONFIG_PLAYER_MODE) -DCONF_ROCKET_IP='"$(CONFIG_PC_IP)"'
 ASFLAGS := 
 LDFLAGS := -specs=3dsx.specs -g $(ARCH) -Wl,-Map,$(notdir $*.map) \
 	   $(foreach dir,$(LIBDIRS),-L$(dir)/lib)
@@ -73,7 +73,7 @@ $(ROMFS)/:
 
 # PNG-to-bin with tex3ds
 %.bin: %.png $(ROMFS)/
-	$(TEX) $< -o $(ROMFS)/$@
+	$(TEX) $< -z auto -o $(ROMFS)/$@
 
 # flac-to-ogg / mp3-to-ogg / ogg-to-ogg with basic music converter
 %.ogg: %.flac $(ROMFS)/

@@ -145,27 +145,28 @@ void fullscreenQuad(C3D_Tex texture, float shift, float zoom) {
     float textureBottom = 1.0 * zoom;
     
     // Turn off depth test as well as write
-    C3D_DepthTest(false, GPU_GEQUAL, GPU_WRITE_COLOR);
-    
+    C3D_DepthTest(true, GPU_GEQUAL, GPU_WRITE_ALL);
+    float depth = 0.0f;
+
     // Draw a textured quad directly
     C3D_ImmDrawBegin(GPU_TRIANGLES);
         
-        C3D_ImmSendAttrib(0.0, 0.0, 0.5f, 0.0f);
+        C3D_ImmSendAttrib(0.0, 0.0, depth, 0.0f);
         C3D_ImmSendAttrib(textureLeft, textureBottom, 0.0f, 0.0f);
 
-        C3D_ImmSendAttrib(SCREEN_WIDTH, SCREEN_HEIGHT, 0.5f, 0.0f);
+        C3D_ImmSendAttrib(SCREEN_WIDTH, SCREEN_HEIGHT, depth, 0.0f);
         C3D_ImmSendAttrib(textureRight, textureTop, 0.0f, 0.0f);
 
-        C3D_ImmSendAttrib(SCREEN_WIDTH, 0.0, 0.5f, 0.0f);
+        C3D_ImmSendAttrib(SCREEN_WIDTH, 0.0, depth, 0.0f);
         C3D_ImmSendAttrib(textureRight, textureBottom, 0.0f, 0.0f);
 
-        C3D_ImmSendAttrib(0.0, 0.0, 0.5f, 0.0f);
+        C3D_ImmSendAttrib(0.0, 0.0, depth, 0.0f);
         C3D_ImmSendAttrib(textureLeft, textureBottom, 0.0f, 0.0f);
 
-        C3D_ImmSendAttrib(0.0, SCREEN_HEIGHT, 0.5f, 0.0f);
+        C3D_ImmSendAttrib(0.0, SCREEN_HEIGHT, depth, 0.0f);
         C3D_ImmSendAttrib(textureLeft, textureTop, 0.0f, 0.0f);
 
-        C3D_ImmSendAttrib(SCREEN_WIDTH, SCREEN_HEIGHT, 0.5f, 0.0f);
+        C3D_ImmSendAttrib(SCREEN_WIDTH, SCREEN_HEIGHT, depth, 0.0f);
         C3D_ImmSendAttrib(textureRight, textureTop, 0.0f, 0.0f);
 
     C3D_ImmDrawEnd();
@@ -525,6 +526,7 @@ void loadTexture(C3D_Tex* tex, C3D_TexCube* cube, const char* path) {
     
     // Set basic options 
     C3D_TexSetFilter(tex, GPU_LINEAR, GPU_LINEAR);
+    C3D_TexSetFilterMipmap(tex, GPU_LINEAR);
     C3D_TexSetWrap(tex, GPU_REPEAT, GPU_REPEAT);
 
     // Delete the t3x object since we don't need it
@@ -558,7 +560,7 @@ void loadTextureSys(C3D_Tex* tex, C3D_TexCube* cube, const char* path) {
 // Set bone mat uniforms from sync value
 // Lerps the matrices for nicer between frame interpolation
 // Assumes loop from last to first frame
-void setBonesFromSync(fbxBasedObject* model, int* boneLocs, float row) {
+void setBonesFromSync(fbxBasedObject* model, int* boneLocs, float row, int first, int last) {
     int frameCount = model->frameCount;
     int boneCount = model->boneCount;
 
@@ -571,7 +573,7 @@ void setBonesFromSync(fbxBasedObject* model, int* boneLocs, float row) {
 
     // Set bones
     C3D_Mtx boneMat;   
-    for(int i = 0; i < boneCount; i++) {
+    for(int i = first; i < last; i++) {
         Mtx_Identity(&boneMat);
         for(int j = 0; j < 4 * 3; j++) {
             int amimIdxA = FBX_FRAME_IDX(animPos, i, j, boneCount);
@@ -637,7 +639,7 @@ fbxBasedObject loadFBXObject(const char* filename, C3D_Tex* texture, const char*
 
     // Load sync track
     char trackName[255];
-    sprintf(trackName, "%s.frame", syncPrefix);
+    sprintf(trackName, "%s:frame", syncPrefix);
     object.frameSync = sync_get_track(rocket, trackName);
 
     // Store texture

@@ -89,7 +89,7 @@ extern int32_t divf32(int32_t a, int32_t b);
 
 typedef struct { float position[3]; float texcoord[2]; float normal[3]; } vertex;
 typedef struct { float position[3]; float texcoord[2]; float normal[3]; float tangent[3]; } vertex2;
-typedef struct { float position[3]; float bones[2]; float boneWeights[2]; float normal[3]; float texcoord[2]; } vertex_rigged;
+typedef struct { float position[3]; float bones[1]; float boneWeights[1]; float normal[3]; float texcoord[2]; } vertex_rigged;
 
 typedef struct fbxBasedObject {
     // Vertices with bones
@@ -361,7 +361,7 @@ extern void waitForA(const char* msg);
 void loadTexture(C3D_Tex* tex, C3D_TexCube* cube, const char* path);
 void loadTextureSys(C3D_Tex* tex, C3D_TexCube* cube, const char* path);
 fbxBasedObject loadFBXObject(const char* filename, C3D_Tex* tex, const char* syncPrefix);
-void setBonesFromSync(fbxBasedObject* model, int* boneLocs, float row);
+void setBonesFromSync(fbxBasedObject* model, int* boneLocs, float row, int first, int last);
 void getBoneMat(fbxBasedObject* model, float row, C3D_Mtx* boneMat, int boneNb);
 void freeFBXObject(fbxBasedObject* object);
 

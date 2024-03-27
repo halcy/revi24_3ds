@@ -5,7 +5,7 @@
 #define TOOLS_BASICS_ONLY
 #include "Tools.h"
 
-//#define DEBUG
+#define DEBUG
 
 fbxBasedObject loadFBXObject(const char* filename, const char* objectName) {
     // Output object
@@ -129,9 +129,9 @@ fbxBasedObject loadFBXObject(const char* filename, const char* objectName) {
                     objectNew.vbo[setVertIdx].position[1] = pos.y;
                     objectNew.vbo[setVertIdx].position[2] = pos.z;
                     objectNew.vbo[setVertIdx].bones[0] = boneIdx.x * 3.0;
-                    objectNew.vbo[setVertIdx].bones[1] = boneIdx.y * 3.0;
+                    //objectNew.vbo[setVertIdx].bones[1] = boneIdx.y * 3.0;
                     objectNew.vbo[setVertIdx].boneWeights[0] = boneWgt.x;
-                    objectNew.vbo[setVertIdx].boneWeights[1] = boneWgt.y;
+                    //objectNew.vbo[setVertIdx].boneWeights[1] = boneWgt.y;
                     objectNew.vbo[setVertIdx].normal[0] = normal.x;
                     objectNew.vbo[setVertIdx].normal[1] = normal.y;
                     objectNew.vbo[setVertIdx].normal[2] = normal.z;
@@ -155,19 +155,22 @@ fbxBasedObject loadFBXObject(const char* filename, const char* objectName) {
                 int stack_use = 0;
                 int stack_frames = 0;
                 for(int i = scene->anim_stacks.count - 1; i >= 0; i--) {
+                /*for(int i = 0; i < scene->anim_stacks.count; i++) {*/
                     ufbx_anim_stack* anim_stack = scene->anim_stacks.data[i];
                     int frames = (int)((anim_stack->anim.time_end - anim_stack->anim.time_begin) / (1.0 / 60.0) + 0.5);
+                    printf("* Stack %d: %d frames\n", i, frames);
                     if(frames > stack_frames) {
                         stack_use = i;
                         stack_frames = frames;
                     }
                 }
+                printf("Using stack %d\n", stack_use);
 
                 #ifdef DEBUG
                 printf("Loading animation\n");
                 #endif
                 ufbx_anim_stack* anim_stack = scene->anim_stacks.data[stack_use];
-
+                printf("%p %p\n", anim_stack, skin);
                 // We sample at 60fps
                 float frameDur = 1.0 / 60.0;
                 size_t frameCount = (size_t)((anim_stack->anim.time_end - anim_stack->anim.time_begin) / frameDur + 0.5);

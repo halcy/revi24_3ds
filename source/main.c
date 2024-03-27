@@ -70,63 +70,29 @@ extern void effectIntroInit();
 extern void effectIntroRender(C3D_RenderTarget* targetLeft, C3D_RenderTarget* targetRight, float row, float iod);
 extern void effectIntroExit();
 
-extern void effectBillboardsInit();
-extern void effectBillboardsRender(C3D_RenderTarget* targetLeft, C3D_RenderTarget* targetRight, float row, float iod);
-extern void effectBillboardsExit();
-
-extern void effectSignScrollerInit();
-extern void effectSignScrollerRender(C3D_RenderTarget* targetLeft, C3D_RenderTarget* targetRight, float row, float iod);
-extern void effectSignScrollerExit();
-
-extern void effectLichthausInit();
-extern void effectLichthausRender(C3D_RenderTarget* targetLeft, C3D_RenderTarget* targetRight, float row, float iod);
-extern void effectLichthausExit();
-
-extern void effectInfinizoomInit();
-extern void effectInfinizoomRender(C3D_RenderTarget* targetLeft, C3D_RenderTarget* targetRight, float row, float iod);
-extern void effectInfinizoomExit();
-
-extern void effectSlideInit();
-extern void effectSlideRender(C3D_RenderTarget* targetLeft, C3D_RenderTarget* targetRight, float row, float iod);
-extern void effectSlideExit();
-
 // A few externed images for preloading
 extern C3D_Tex texBillboard1;
 extern C3D_Tex texBillboard2;
 extern C3D_Tex texBillboard3;
 
 int main() {
-    bool DUMPFRAMES = true;
+    bool DUMPFRAMES = false;
     bool DUMPFRAMES_3D = true;
-    float DUMPFRAMES_3D_SEP = 0.55;
+    float DUMPFRAMES_3D_SEP = 1.0;
+    float DUMPFRAMES_FPS = 30.0;
+    int DUMPFRAMES_FIRST = 0;
+    int DUMPFRAMES_LAST = 4350;
 
     // Set up effect list. Sequencing is done in Rocket
-    #define EFFECT_MAX 6
+    #define EFFECT_MAX 1
     effect effect_list[EFFECT_MAX];
 
     effect_list[0].init = effectIntroInit;
     effect_list[0].render = effectIntroRender;
     effect_list[0].exit = effectIntroExit;
 
-    effect_list[1].init = effectBillboardsInit;
-    effect_list[1].render = effectBillboardsRender;
-    effect_list[1].exit = effectBillboardsExit;
-
-    effect_list[2].init = effectSignScrollerInit;
-    effect_list[2].render = effectSignScrollerRender;
-    effect_list[2].exit = effectSignScrollerExit;
-
-    effect_list[3].init = effectLichthausInit;
-    effect_list[3].render = effectLichthausRender;
-    effect_list[3].exit = effectLichthausExit;
-
-    effect_list[4].init = effectInfinizoomInit;
-    effect_list[4].render = effectInfinizoomRender;
-    effect_list[4].exit = effectInfinizoomExit;
-
-    effect_list[5].init = effectSlideInit;
-    effect_list[5].render = effectSlideRender;
-    effect_list[5].exit = effectSlideExit;
+    // turn on new 3DS boost
+    osSetSpeedupEnable(true);
 
     // Initialize graphics
     gfxInit(GSP_RGBA8_OES, GSP_BGR8_OES, false);
@@ -158,11 +124,6 @@ int main() {
     if (connect_rocket()) {
         return(0);
     }
-
-    // Some funny image preloading so we don't have to do it during the effect
-    loadTextureSys(&texBillboard1, NULL, "romfs:/tex_billboards1.bin");
-    loadTextureSys(&texBillboard2, NULL, "romfs:/tex_billboards2.bin");
-    loadTextureSys(&texBillboard3, NULL, "romfs:/tex_billboards3.bin");
 
     // Load shaders
     vshader_dvlb = DVLB_ParseFile((u32*)vshader_shbin, vshader_shbin_size);
@@ -200,26 +161,13 @@ int main() {
     }
 #endif
 
-    printf("\n");
-    printf(" Nordlicht 2023\n");
-    printf(" =================\n");
-    printf("\n");
-    printf("     NORDLICHT EXPRESS\n");
-    printf("   __________________________________\n");
-    printf("  /__/    |___|   |   |___|   |___|  |\n");
-    printf(" |________________|__________________|\n");
-    printf("   o--o      o--o   o--o        o--o \n");
-    printf(" \n");
-    printf(" 8th to 10th September 2023\n");
-    printf(" Bremen, Germany\n");
-
     // wait a little for things (audio) to properly load in
-    sleep(10);
+    // sleep(10);
 
     // global sync stuff
-    const struct sync_track* sync_fade = sync_get_track(rocket, "global.fade");
-    const struct sync_track* sync_effect = sync_get_track(rocket, "global.effect");;    
-    const struct sync_track* sync_img = sync_get_track(rocket, "global.image");
+    const struct sync_track* sync_fade = sync_get_track(rocket, "global:fade");
+    const struct sync_track* sync_effect = sync_get_track(rocket, "global:effect");;    
+    const struct sync_track* sync_img = sync_get_track(rocket, "global:overlay");
 
     // Start up first effect
     int current_effect = (int)sync_get_val(sync_effect, row + 0.01);
@@ -228,15 +176,29 @@ int main() {
     audio_init_play();
     row = audio_get_row();
 
-    int fc = 0;
-    //int fc = 869;
+    if (DUMPFRAMES) {
+        // Create directories if they do not exist
+        printf("Creating directories for frame dump...\n");
+        mkdir("cdumpl", 0777);
+        mkdir("cdumpr", 0777);
+        char fname[255];
+        for(int dc = 1; dc <= 45; dc++) {
+            sprintf(fname, "cdumpl/dump%d/", dc);
+            mkdir(fname, 0777);
+            sprintf(fname, "cdumpr/dump%d/", dc);
+            mkdir(fname, 0777);
+        }
+    }
+
+    int fc = DUMPFRAMES_FIRST;
+    int has_dumped = 0;
     while (aptMainLoop()) {
         if (!DUMPFRAMES) {
             row = audio_get_row();
         }
         else {
             printf("Frame dump %d\n", fc);
-            row = ((double)fc * (((float)SONG_SPS) * 2.0 / 60.0)) / (double)SAMPLES_PER_ROW;
+            row = ((double)fc * (((float)SONG_SPS) * 2.0 / DUMPFRAMES_FPS)) / (double)SAMPLES_PER_ROW;
         }
 
 #ifndef SYNC_PLAYER
@@ -264,11 +226,14 @@ int main() {
 
 
         // Fading update
+        float fadeValPrev = fadeVal;
         fadeVal = sync_get_val(sync_fade, row);
-        FillBitmap(&fadeBitmap, RGBAf(0.0, 0.0, 0.0, fadeVal));
-        GSPGPU_FlushDataCache(fadePixels, 64 * 64 * sizeof(Pixel));
-        GX_DisplayTransfer((u32*)fadePixels, GX_BUFFER_DIM(64, 64), (u32*)fade_tex.data, GX_BUFFER_DIM(64, 64), TEXTURE_TRANSFER_FLAGS);
-        gspWaitForPPF();
+        if(fadeVal != fadeValPrev) {
+            FillBitmap(&fadeBitmap, RGBAf(0.0, 0.0, 0.0, fadeVal));
+            GSPGPU_FlushDataCache(fadePixels, 64 * 64 * sizeof(Pixel));
+            GX_DisplayTransfer((u32*)fadePixels, GX_BUFFER_DIM(64, 64), (u32*)fade_tex.data, GX_BUFFER_DIM(64, 64), TEXTURE_TRANSFER_FLAGS);
+        }
+        // gspWaitForPPF();*/
 
         // Respond to user input
         hidScanInput();
@@ -293,24 +258,34 @@ int main() {
 
             u8* fbl = gfxGetFramebuffer(GFX_TOP, GFX_LEFT, NULL, NULL);
 
-            char fname[255];
-            sprintf(fname, "dump/dump%d/fb_left_%08d.raw", (fc/2000)+1, fc);
-            FILE* file = fopen(fname,"w");
-            fwrite(fbl, sizeof(int32_t), SCREEN_HEIGHT * SCREEN_WIDTH, file);
-            fflush(file);
-            fclose(file);
-
-            if(DUMPFRAMES_3D) {
-                u8* fbr = gfxGetFramebuffer(GFX_TOP, GFX_RIGHT, NULL, NULL);
-                sprintf(fname, "dump/dump%d/fb_right_%08d.raw", (fc/2000)+1, fc);
-                file = fopen(fname,"w");
-                fwrite(fbr, sizeof(int32_t), SCREEN_HEIGHT * SCREEN_WIDTH, file);
+            if(has_dumped == 0) {
+                has_dumped = 1;
+            }
+            else {
+                char fname[255];
+                sprintf(fname, "cdumpl/dump%d/fb_left_%08d.raw", (fc/300)+1, fc);
+                FILE* file = fopen(fname,"w");
+                fwrite(fbl, sizeof(int32_t), SCREEN_HEIGHT * SCREEN_WIDTH, file);
                 fflush(file);
                 fclose(file);
+
+                if(DUMPFRAMES_3D) {
+                    u8* fbr = gfxGetFramebuffer(GFX_TOP, GFX_RIGHT, NULL, NULL);
+                    sprintf(fname, "cdumpr/dump%d/fb_right_%08d.raw", (fc/300)+1, fc);
+                    file = fopen(fname,"w");
+                    fwrite(fbr, sizeof(int32_t), SCREEN_HEIGHT * SCREEN_WIDTH, file);
+                    fflush(file);
+                    fclose(file);
+                }
             }
         }
 
         fc++;
+        if(DUMPFRAMES) {
+            if(fc == DUMPFRAMES_LAST) {
+                break;
+            }
+        }
         audio_update();
     }
 
