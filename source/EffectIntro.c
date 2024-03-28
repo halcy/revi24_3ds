@@ -81,7 +81,7 @@ void effectIntroInit() {
     C3D_TexSetWrap(&scrollTex, GPU_CLAMP_TO_EDGE, GPU_CLAMP_TO_EDGE);
 
     // Load a model
-    loadTexture(&texIntro, NULL, "romfs:/tex_haus.bin");
+    loadTexture(&texIntro, NULL, "romfs:/tex_intro.bin");
     loadTexture(&texEmpty, NULL, "romfs:/tex_empty.bin");
     C3D_TexSetFilter(&texEmpty, GPU_NEAREST, GPU_NEAREST);
 
@@ -198,7 +198,8 @@ static void drawModel(fbxBasedObject* model, float row) {
     else {
         C3D_DepthTest(true, GPU_GEQUAL, GPU_WRITE_COLOR);
     }
-    C3D_CullFace(GPU_CULL_BACK_CCW);
+    //C3D_CullFace(GPU_CULL_BACK_CCW);
+    C3D_CullFace(GPU_CULL_NONE);
     C3D_AlphaBlend(GPU_BLEND_ADD, GPU_BLEND_ADD, GPU_SRC_ALPHA, GPU_ONE_MINUS_SRC_ALPHA, GPU_SRC_ALPHA, GPU_ONE_MINUS_SRC_ALPHA);
  
     // Actual drawcall
@@ -237,8 +238,8 @@ void effectIntroRender(C3D_RenderTarget* targetLeft, C3D_RenderTarget* targetRig
     // Send modelview 
     C3D_Mtx baseview;
     Mtx_Identity(&baseview);
-    Mtx_RotateZ(&baseview, M_PI + syncPanXVal, true);
-    Mtx_RotateX(&baseview, -M_PI / 2 + syncPanYVal, true);
+    Mtx_RotateZ(&baseview, M_PI, true);
+    Mtx_RotateX(&baseview, -M_PI / 2, true);
     Mtx_RotateY(&baseview, M_PI, true);
     
     C3D_Mtx camMat;
@@ -263,8 +264,8 @@ void effectIntroRender(C3D_RenderTarget* targetLeft, C3D_RenderTarget* targetRig
     C3D_FVUnifMtx4x4(GPU_VERTEX_SHADER, uLocProjection, &projection);
 
     // Dispatch drawcalls
-    skyboxCubeImmediate(&texSky, 1000.0f, vec3(0.0f, 0.0f, 0.0f), &skyview, &projection); 
-    C3D_FVUnifMtx4x4(GPU_VERTEX_SHADER, uLocModelview,  &modelviewHaus);
+    //skyboxCubeImmediate(&texSky, 2.0f, vec3(0.0f, 0.0f, 0.0f), &skyview, &projection); 
+    C3D_FVUnifMtx4x4(GPU_VERTEX_SHADER, uLocModelview,  &skyview);
     drawModel(&models[0], row);
     //drawModel(&models[2], row);
     //C3D_FVUnifMtx4x4(GPU_VERTEX_SHADER, uLocModelview,  &modelview);

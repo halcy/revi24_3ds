@@ -175,10 +175,10 @@ fbxBasedObject loadFBXObject(const char* filename, const char* objectName) {
                 float frameDur = 1.0 / 60.0;
                 size_t frameCount = (size_t)((anim_stack->anim.time_end - anim_stack->anim.time_begin) / frameDur + 0.5);
                 size_t boneCount = skin->clusters.count;
-                #ifdef DEBUG
+                //#ifdef DEBUG
                 printf("  * frame count: %ld\n", frameCount);
                 printf("  * bone count: %ld\n", boneCount);
-                #endif
+                //#endif
 
                 // Alloc data for frames
                 objectNew.frameCount = frameCount;

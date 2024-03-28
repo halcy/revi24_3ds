@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rootElement>
+<tracks rows="10000" startRow="0" endRow="10000" rowsPerBeat="8"
+beatsPerMin="125">
+	<track name="global:fade" folded="0" muteKeyCount="0"
+color="ffb27474">
+		<key row="0" value="0.000000" interpolation="0" />
+	</track>
+	<track name="global:effect" folded="0" muteKeyCount="0"
+color="ffb28050" />
+	<track name="global:overlay" folded="0" muteKeyCount="0"
+color="ffa9b250" />
+	<track name="intro:plug:frame" folded="0" muteKeyCount="0"
+color="ff60b250">
+		<key row="0" value="0.000000" interpolation="1" />
+		<key row="208" value="1000.000000" interpolation="0" />
+	</track>
+	<track name="intro:cam:frame" folded="0" muteKeyCount="0"
+color="ff4fb292">
+		<key row="0" value="0.000000" interpolation="1" />
+		<key row="208" value="1000.000000" interpolation="0" />
+	</track>
+	<track name="intro:cam:zoom" folded="0" muteKeyCount="0"
+color="ff4f71b2">
+		<key row="0" value="-40.000000" interpolation="0" />
+	</track>
+	<track name="intro:cam:panx" folded="0" muteKeyCount="0"
+color="ff8850b2">
+		<key row="0" value="-20.000000" interpolation="0" />
+	</track>
+	<track name="intro:cam:pany" folded="0" muteKeyCount="0"
+color="ffb25091">
+		<key row="0" value="-10.000000" interpolation="1" />
+	</track>
+	<track name="intro:skyrot" folded="0" muteKeyCount="0"
+color="ffb27474" />
+	<track name="intro:text:scroll" folded="0" muteKeyCount="0"
+color="ffb28050" />
+	<track name="global:depthsep" folded="0" muteKeyCount="0"
+color="ffa9b250" />
+</tracks>
+	</rootElement>
